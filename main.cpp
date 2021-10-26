@@ -3,7 +3,7 @@ IT FINDS THE DATE AND TIME D'ANGELO WORKS AND TURNS THAT DATA INTO AN ICS FILE T
 
 #include <iostream>
 #include <fstream>
-#include <vector>
+#include <vector> // new comment
 #include <string>
 #include <stdlib.h>
 #include <ctime>
@@ -222,7 +222,7 @@ void storeShifts(string weekStr, vector<ShiftData*>& WShifts) {
                 WShifts.at(index)->startMonth = month; //problem: MONTH INPUT DOES NOT WORK IF THE FIRST SHIFT WORKED ON THE SCHEDULE IS NOT IN THE START MONTH
                 WShifts.at(index)->endMonth = month;
                 WShifts.at(index)->startYear = year;
-                WShifts.at(index)->endYear = year; // add comment
+                WShifts.at(index)->endYear = year;
 
                 if (atoi(time.substr(0 , time.length() - 5).c_str()) > atoi(time.substr(time.length() - 4 , time.length()).c_str())) { // if start of shift is larger than end of shift then it goes to the next day
                     getNextDay(WShifts.at(index)->endMonth, WShifts.at(index)->endDay, WShifts.at(index)->endYear);
