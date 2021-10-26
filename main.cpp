@@ -1,12 +1,9 @@
-/* THIS PROGRAM TAKES A COPY AND PASTED SCHEDULE FOR UCPD
-IT FINDS THE DATE AND TIME D'ANGELO WORKS AND TURNS THAT DATA INTO AN ICS FILE TO INPUT INTO A CALENDAR APPLICATION*/
-
 #include <iostream>
 #include <fstream>
-#include <vector> //HELLO
-#include <string> // new main-edits
-#include <stdlib.h> // after u
-#include <ctime> // bing
+#include <vector>
+#include <string>
+#include <stdlib.h>
+#include <ctime>
 
 using namespace std;
 
@@ -205,7 +202,7 @@ void storeShifts(string weekStr, vector<ShiftData*>& WShifts) {
                 WShifts.at(index)->shift = week.at(i)->at(0);
                 WShifts.at(index)->startTime = time.substr(0 , time.length() - 5);
                 WShifts.at(index)->endTime = time.substr(time.length() - 4 , time.length());
-                if (Sday.substr(0, 3) == "Sun" || Sday.substr(0, 3) == "Mon" || Sday.substr(0, 3) == "Fri") {
+                if (Sday.substr(0, 3) == "Sun" || Sday.substr(0, 3) == "Mon" || Sday.substr(0, 3) == "Fri") { //remove the day of the week from the date
                     WShifts.at(index)->startDay = atoi(Sday.substr(6, Sday.length()).c_str());
                 }
                 else if (Sday.substr(0, 3) == "Tue") {
@@ -220,7 +217,7 @@ void storeShifts(string weekStr, vector<ShiftData*>& WShifts) {
                 WShifts.at(index)->endDay = WShifts.at(index)->startDay;
 
                 WShifts.at(index)->startMonth = month; //problem: MONTH INPUT DOES NOT WORK IF THE FIRST SHIFT WORKED ON THE SCHEDULE IS NOT IN THE START MONTH
-                WShifts.at(index)->endMonth = month;
+                WShifts.at(index)->endMonth = month; // possible solution : if the day worked is smaller than the day of the start of the week add 1 to  the month, must check for last month of year
                 WShifts.at(index)->startYear = year;
                 WShifts.at(index)->endYear = year;
 
