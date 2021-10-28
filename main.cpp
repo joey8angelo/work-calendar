@@ -1,3 +1,6 @@
+/* THIS PROGRAM TAKES A COPY AND PASTED SCHEDULE FOR UCPD
+IT FINDS THE DATE AND TIME D'ANGELO WORKS AND TURNS THAT DATA INTO AN ICS FILE TO INPUT INTO A CALENDAR APPLICATION*/
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -19,9 +22,9 @@ struct ShiftData {
     int endMonth;
 };
 
-void splitWeeks();
+void splitWeeks(int&, int&);
 
-void storeShifts(string, vector<ShiftData*>&);
+void storeShifts(string, vector<ShiftData*>&, int);
 
 void getNextDay(int&, int&, int&);
 
@@ -29,15 +32,18 @@ string makeDateStamp(int, int, int, string);
 
 bool isLeap(int);
 
+int splitDayNum(string);
+
 int main() {
     ofstream outFS;
     vector<ShiftData*> W1Shifts; //vector of structs
     vector<ShiftData*> W2Shifts;
+    int month1, month2;
     
-    splitWeeks();
+    splitWeeks(month1, month2);
  
-    storeShifts("week1.txt", W1Shifts);
-    storeShifts("week2.txt", W2Shifts);
+    storeShifts("week1.txt", W1Shifts, month1); // stores the data in the text files into the formatted vector of structs
+    storeShifts("week2.txt", W2Shifts, month2);
     
     
     outFS.open("output.ics");
@@ -46,8 +52,9 @@ int main() {
         exit(EXIT_FAILURE);
     }
     
-    
+    //ICS file formatting
     outFS << "BEGIN:VCALENDAR\nPRODID:-//Google Inc//Google Calendar 70.9054//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nBEGIN:VTIMEZONE\nTZID:America/Los_Angeles\nLAST-MODIFIED:20201011T015911Z\nBEGIN:DAYLIGHT\nTZNAME:PDT\nTZOFFSETFROM:-0800\nTZOFFSETTO:-0700\nDTSTART:19700308T020000\nEND:DAYLIGHT\nBEGIN:STANDARD\nTZNAME:PST\nTZOFFSETFROM:-0700\nTZOFFSETTO:-0800\nDTSTART:19701101T020000\nEND:STANDARD\nEND:VTIMEZONE\n";
+    //repeat for every event in the file
     for (int i = 0; i < W1Shifts.size(); i++) {
         outFS << "BEGIN:VEVENT\nDTSTART:";
         outFS << makeDateStamp(W1Shifts.at(i)->startYear, W1Shifts.at(i)->startMonth, W1Shifts.at(i)->startDay, W1Shifts.at(i)->startTime) << endl;
@@ -60,6 +67,7 @@ int main() {
         outFS << "STATUS:CONFIRMED\nSUMMARY:" << W1Shifts.at(i)->shift << endl;
         outFS << "TRANSP:OPAQUE\nEND:VEVENT\n";
     }
+    //repeat again for every event for the second week
     for (int i = 0; i < W2Shifts.size(); i++) {
         outFS << "BEGIN:VEVENT\nDTSTART:";
         outFS << makeDateStamp(W2Shifts.at(i)->startYear, W2Shifts.at(i)->startMonth, W2Shifts.at(i)->startDay, W2Shifts.at(i)->startTime) << endl;
@@ -81,11 +89,11 @@ int main() {
     
 }
 
-void splitWeeks() {
+void splitWeeks(int& month1, int& month2) {
     ifstream inFS;
     ofstream outFS;
     int W2Index;
-   
+    string newStr;
     vector<string> tempVec;
     string tempStr;
    
@@ -96,33 +104,29 @@ void splitWeeks() {
         exit(EXIT_FAILURE);
     }
    
-    while (getline(inFS, tempStr)) {
+    while (getline(inFS, tempStr))
         tempVec.push_back(tempStr); //store every line of the file
-    }
    
     tempVec.erase(tempVec.begin() + 0);
+    month1 = atoi(tempVec.at(0).substr(0, 2).c_str());
     tempVec.erase(tempVec.begin() + 0);
    
     for(int i = 1; i < tempVec.size() - 1; i++) {
-        if (tempVec.at(i).substr(0, 5) == "SHIFT") { //find the index of the start of week two
+        if (tempVec.at(i).substr(0, 5) == "SHIFT") //find the index of the start of week two
             W2Index = i;
-        }
     }
-   
+    month2 = atoi(tempVec.at(W2Index - 1).substr(0, 2).c_str());
     tempVec.erase(tempVec.begin() + (W2Index - 1)); //erase extra stuff
     W2Index -= 1; //The start of week two changes indicies when the line before it is deleted
     tempVec.erase(tempVec.end());
    
     inFS.close();
    
-    string newStr;
-   
     for (int i = 0; i < tempVec.size(); i++) {
         newStr = "";
         for (int j = 0; j < tempVec.at(i).length(); j++) { //remove spaces to properly count
-            if(tempVec.at(i)[j]!=' '){
+            if(tempVec.at(i)[j]!=' ')
                 newStr+=string(1,tempVec.at(i)[j]);
-            }
         }
         tempVec.at(i) = newStr;
     }
@@ -134,9 +138,8 @@ void splitWeeks() {
         exit(EXIT_FAILURE);
     }
    
-    for(int i = 0; i < W2Index; i++) {
+    for(int i = 0; i < W2Index; i++)
         outFS << tempVec.at(i) << endl;
-    }
    
     outFS.close();
     outFS.open("week2.txt");
@@ -146,19 +149,17 @@ void splitWeeks() {
         exit(EXIT_FAILURE);
     }
    
-    for(int i = W2Index; i < tempVec.size(); i++) {
+    for(int i = W2Index; i < tempVec.size(); i++)
         outFS << tempVec.at(i) << endl;
-    }
    
     outFS.close();
 
 }
 
-void storeShifts(string weekStr, vector<ShiftData*>& WShifts) {
+void storeShifts(string weekStr, vector<ShiftData*>& WShifts, int month) {
     ifstream inFS;
     vector<vector<string>*> week;
     string tempVal;
-    int month;
     int year;
    
     inFS.open(weekStr);
@@ -186,44 +187,38 @@ void storeShifts(string weekStr, vector<ShiftData*>& WShifts) {
     
     index = 0;
     
-    cout << "starting month for " << weekStr << ": ";
-    cin >> month;
     cout << "starting year for " << weekStr << ": ";
     cin >> year;
     
     for (int i = 0; i < week.size(); i++) {
         for (int j = 0; j < week.at(i)->size(); j++) {
-            if (week.at(i)->at(j) == "D'Angelo") {
+            if (week.at(i)->at(j) == "D'Angelo") { //find D'Angelo
 
-                WShifts.push_back(new struct ShiftData);
+                WShifts.push_back(new struct ShiftData); //make a new struct for this new shift
                 string time = week.at(i)->at(1);
                 string Sday = week.at(0)->at(j);
                 
                 WShifts.at(index)->shift = week.at(i)->at(0);
                 WShifts.at(index)->startTime = time.substr(0 , time.length() - 5);
                 WShifts.at(index)->endTime = time.substr(time.length() - 4 , time.length());
-                if (Sday.substr(0, 3) == "Sun" || Sday.substr(0, 3) == "Mon" || Sday.substr(0, 3) == "Fri") { //remove the day of the week from the date
-                    WShifts.at(index)->startDay = atoi(Sday.substr(6, Sday.length()).c_str());
-                }
-                else if (Sday.substr(0, 3) == "Tue") {
-                    WShifts.at(index)->startDay = atoi(Sday.substr(7, Sday.length()).c_str());
-                }
-                else if (Sday.substr(0, 3) == "Thu" || Sday.substr(0, 3) == "Sat") {
-                    WShifts.at(index)->startDay = atoi(Sday.substr(8, Sday.length()).c_str());
-                }
-                else {
-                    WShifts.at(index)->startDay = atoi(Sday.substr(9, Sday.length()).c_str());
-                }
+                WShifts.at(index)->startDay = splitDayNum(Sday);
                 WShifts.at(index)->endDay = WShifts.at(index)->startDay;
 
-                WShifts.at(index)->startMonth = month; //problem: MONTH INPUT DOES NOT WORK IF THE FIRST SHIFT WORKED ON THE SCHEDULE IS NOT IN THE START MONTH
-                WShifts.at(index)->endMonth = month; // possible solution : if the day worked is smaller than the day of the start of the week add 1 to  the month, must check for last month of year
+                WShifts.at(index)->startMonth = month;
                 WShifts.at(index)->startYear = year;
-                WShifts.at(index)->endYear = year;
-
-                if (atoi(time.substr(0 , time.length() - 5).c_str()) > atoi(time.substr(time.length() - 4 , time.length()).c_str())) { // if start of shift is larger than end of shift then it goes to the next day
-                    getNextDay(WShifts.at(index)->endMonth, WShifts.at(index)->endDay, WShifts.at(index)->endYear);
+                if (splitDayNum(week.at(0)->at(2)) > WShifts.at(index)->startDay) { //if the first shift is not the first day, and the month changed in between, add the new month/year
+                    if (WShifts.at(index)->startMonth == 12) {
+                        WShifts.at(index)->startMonth = 1; 
+                        WShifts.at(index)->startYear += 1;
+                    }
+                    else
+                        WShifts.at(index)->startMonth += 1;
                 }
+                WShifts.at(index)->endMonth = WShifts.at(index)->startMonth;
+                WShifts.at(index)->endYear = WShifts.at(index)->startYear;
+
+                if (atoi(time.substr(0 , time.length() - 5).c_str()) > atoi(time.substr(time.length() - 4 , time.length()).c_str()))// if the time of the start of the shift is larger than the end of the shift, a new day has passed
+                    getNextDay(WShifts.at(index)->endMonth, WShifts.at(index)->endDay, WShifts.at(index)->endYear);
                 
                 index++;
             }
@@ -231,16 +226,14 @@ void storeShifts(string weekStr, vector<ShiftData*>& WShifts) {
     }
 }
 
-void getNextDay(int& m, int& d, int& y) {
-    if (d > 0 && d < 28) {
+void getNextDay(int& m, int& d, int& y) { //next day must check for: last day of the month, year, and if its a leap year
+    if (d > 0 && d < 28)
         d += 1;
-    }
     else {
         if (m == 2) { // if its feb
             if (d == 28) {
-                if (isLeap(y) == true) { // leap year check
+                if (isLeap(y) == true)// leap year check
                     d += 1;
-                }
                 else {
                     d = 1;
                     m = 3;
@@ -256,9 +249,8 @@ void getNextDay(int& m, int& d, int& y) {
                 d = 1;
                 m += 1;
             }
-            else {
+            else
                 d += 1;
-            }
         }
         else {
             if (d == 31) {
@@ -267,33 +259,28 @@ void getNextDay(int& m, int& d, int& y) {
                     m = 1;
                     y += 1;
                 }
-                else {
+                else
                     m += 1;
-                }
             }
-            else {
+            else
                 d += 1;
-            }
         }
     }
 }
 
-string makeDateStamp (int y, int m, int d, string t) { // formatting for ics
+string makeDateStamp (int y, int m, int d, string t) { // formatting date for ics
     string output;
     
     output += to_string(y);
-    if (m < 10) {
+    if (m < 10)
         output += "0" + to_string(m);
-    }
-    else {
+    else
         output += to_string(m);
-    }
-    if (d < 10) {
+    if (d < 10)
         output += "0" + to_string(d);
-    }
-    else {
+    else
         output += to_string(d);
-    }
+
     output += "T" + t + "00";
     
     return output;
@@ -314,4 +301,18 @@ bool isLeap(int y) {
     else
         is_leap_year = false;
     return is_leap_year;
+}
+
+int splitDayNum(string day) { //finding the number attached to the name of the day
+    if (day.substr(0, 3) == "Sun" || day.substr(0, 3) == "Mon" || day.substr(0, 3) == "Fri")
+        return atoi(day.substr(6, day.length()).c_str());
+
+    else if (day.substr(0, 3) == "Tue") 
+        return atoi(day.substr(7, day.length()).c_str());
+    
+    else if (day.substr(0, 3) == "Thu" || day.substr(0, 3) == "Sat") 
+        return atoi(day.substr(8, day.length()).c_str());
+    
+    else 
+        return atoi(day.substr(9, day.length()).c_str());
 }
