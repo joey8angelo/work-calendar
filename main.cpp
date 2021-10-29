@@ -97,10 +97,10 @@ void splitWeeks(int& month1, int& month2) {
     vector<string> tempVec;
     string tempStr;
    
-    inFS.open("schedule.txt"); //original input file
+    inFS.open("input.txt"); //original input file
    
     if (!inFS.is_open()) {
-        cout << "could not open schedule.txt" << endl;
+        cout << "could not open input.txt" << endl;
         exit(EXIT_FAILURE);
     }
    

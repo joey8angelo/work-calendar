@@ -1,0 +1,16 @@
+SHIFT		HOURS		Sunday 7		Monday 8		Tuesday 9		Wednesday 10		Thursday 11		Friday 12		Saturday 13	
+SHFTNME		1000-1100		xxxxxxx		xx		xx		xx		xx		xx		xxxxxxxx	
+SHFTNME		1100-1200		xx		xx		xx		xx		xx		xx		xx	
+SHFTNME		1200-1300		xxxxx		xx		xx		xx		xx		xx		xxxxxxxx	
+SHFTNME		1300-1400		Xx		xxxxxxxxx		xxxxxxx		xxxxxxxx		xxxxxxxx		xxxxxxxxx		Xx	
+SHFTNME		1400-1500		xxxx		xxxxx		xxxxxxxx		xxxxx		xxxxx		xxxxxxx		xxxxxxxx	
+SHFTNME		1500-1600		xxx		xxxxxxx		xxx		xxx		xxxxxxx		xxxxxxxx		D'Angelo	
+SHFTNME		1600-1700		Partial		Partial		Partial		Partial		xxxxxxx		xxxxxx		xxxxxxxxx	
+SHFTNME		1700-1800		xx		xx		xx		xx		xx		xx		xx	
+SHFTNME		1800-1900		xxxxxx		xxxxxxxx		xxxxxxxx		xxxxxxxxx		xxxxxx		D'Angelo		xxxxx	
+SHFTNME		1900-2000		xx		xx		xx		xx		xx		xx		xx	
+SHFTNME		2000-2100		Partial		Partial		Partial		Partial		Partial		Partial		Partial	
+SHFTNME		2100-2200		xxxxxxxxxxxx		xxxxxxx		xxxxxxxx		xxxxxxxx		xxxxxx		xxxxxxx		xxxxxx	
+SHFTNME		2200-2300		xx		xx		xx		xx		xx		xx		xx	
+SHFTNME		2300-2400		xxxxxx		xx		xx		xx		D'Angelo		xxx		Partial	
+SHFTNME		2400-0100		xxxxxxxx		xxxxxxxx		xxxxxxx		xxxxxxx		xxxxxxx		xxxxxxxx		xxxxxxxx
