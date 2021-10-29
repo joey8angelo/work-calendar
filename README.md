@@ -3,7 +3,7 @@ hello this is a test
 ##Table of contents
 * [Test One](#test-one)
 * [Test Two](#test-two)
-** [smaller thing](#smaller-thing)
+* [smaller thing](#smaller-thing)
 
 ## Test One
 This is test one the first of many
