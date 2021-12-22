@@ -2,8 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include <stdlib.h>
-#include <ctime>
+#include <time.h>
 
 using namespace std;
 
@@ -30,6 +29,8 @@ string makeDateStamp(int, int, int, string);
 bool isLeap(int);
 
 int splitDayNum(string);
+
+bool isName(string);
 
 int main() {
     ofstream outFS;
@@ -158,6 +159,7 @@ void storeShifts(string weekStr, vector<ShiftData*>& WShifts, int month) {
     vector<vector<string>*> week;
     string tempVal;
     int year;
+    int currMonth;
    
     inFS.open(weekStr);
    
@@ -184,24 +186,32 @@ void storeShifts(string weekStr, vector<ShiftData*>& WShifts, int month) {
     
     index = 0;
     
-    cout << "starting year for " << weekStr << ": ";
-    cin >> year;
-    
     for (int i = 0; i < week.size(); i++) {
         for (int j = 0; j < week.at(i)->size(); j++) {
-            if (week.at(i)->at(j) == "D'Angelo") { //find D'Angelo
+            if (isName(week.at(i)->at(j))) { //find D'Angelo
 
                 WShifts.push_back(new struct ShiftData); //make a new struct for this new shift
-                string time = week.at(i)->at(1);
+                string shiftTime = week.at(i)->at(1);
                 string Sday = week.at(0)->at(j);
                 
                 WShifts.at(index)->shift = week.at(i)->at(0);
-                WShifts.at(index)->startTime = time.substr(0 , time.length() - 5);
-                WShifts.at(index)->endTime = time.substr(time.length() - 4 , time.length());
+                WShifts.at(index)->startTime = shiftTime.substr(0 , shiftTime.length() - 5);
+                WShifts.at(index)->endTime = shiftTime.substr(shiftTime.length() - 4 , shiftTime.length());
                 WShifts.at(index)->startDay = splitDayNum(Sday);
                 WShifts.at(index)->endDay = WShifts.at(index)->startDay;
 
                 WShifts.at(index)->startMonth = month;
+
+                time_t t = time(NULL);
+                tm* tPtr = localtime(&t);
+
+                year = (tPtr->tm_year) + 1900;
+                currMonth = (tPtr->tm_mon) + 1;
+
+                if (currMonth > month) { // if the current month is less than the starting month of the first shift, then a year change occurred
+                    ++year;
+                }
+
                 WShifts.at(index)->startYear = year;
                 if (splitDayNum(week.at(0)->at(2)) > WShifts.at(index)->startDay) { //if the first shift is not the first day, and the month changed in between, add the new month/year
                     if (WShifts.at(index)->startMonth == 12) {
@@ -214,7 +224,7 @@ void storeShifts(string weekStr, vector<ShiftData*>& WShifts, int month) {
                 WShifts.at(index)->endMonth = WShifts.at(index)->startMonth;
                 WShifts.at(index)->endYear = WShifts.at(index)->startYear;
 
-                if (atoi(time.substr(0 , time.length() - 5).c_str()) > atoi(time.substr(time.length() - 4 , time.length()).c_str()))// if the time of the start of the shift is larger than the end of the shift, a new day has passed
+                if (atoi(shiftTime.substr(0 , shiftTime.length() - 5).c_str()) > atoi(shiftTime.substr(shiftTime.length() - 4 , shiftTime.length()).c_str()))// if the time of the start of the shift is larger than the end of the shift, a new day has passed
                     getNextDay(WShifts.at(index)->endMonth, WShifts.at(index)->endDay, WShifts.at(index)->endYear);
                 
                 index++;
@@ -312,4 +322,21 @@ int splitDayNum(string day) { //finding the number attached to the name of the d
     
     else 
         return atoi(day.substr(9, day.length()).c_str());
+}
+ 
+bool isName(string s) {
+    string temp = "";
+    string name = "dangelo";
+    for(int i = 0; i < s.size(); i++) {
+        if (name.find(tolower(s[i])) == string::npos){// any char not in "name" gets removed
+            s.erase(i, 1);                            // this accounts for the scheduling convention that if someone is being trained
+            i--;                                      // by you it will appear as D'Angelo(C##)
+        }
+        else
+            temp += tolower(s[i]);
+    }
+    if (temp == name)
+        return true;
+    else 
+        return false;
 }
